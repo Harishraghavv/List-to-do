@@ -1,0 +1,184 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>TaskOrbit | Clean & Modern To-Do Web App</title>
+  <meta name="description" content="A clean, responsive To-Do List Web App built with HTML, CSS, and JavaScript. Featuring task creation, editing, deletion, priority tags, filters, and localStorage persistence.">
+  
+  <!-- Google Fonts: Inter & Outfit -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Outfit:wght@600;700&display=swap" rel="stylesheet">
+  
+  <!-- FontAwesome Icons -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
+  
+  <!-- Stylesheet -->
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <div class="app-wrapper">
+    <!-- Header / Brand -->
+    <header class="app-header">
+      <div class="brand">
+        <div class="brand-icon">
+          <i class="fa-solid fa-list-check"></i>
+        </div>
+        <div>
+          <h1 class="brand-title">TaskOrbit</h1>
+          <p class="brand-tagline">Stay organized & achieve your daily goals</p>
+        </div>
+      </div>
+      <div class="header-badge">
+        <i class="fa-solid fa-shield-heart"></i>
+        <span>CodeOrbit Tech Internship</span>
+      </div>
+    </header>
+
+    <!-- Main Card Container -->
+    <main class="todo-card">
+      <!-- Input Section -->
+      <section class="input-section">
+        <form id="todo-form" class="todo-form">
+          <div class="input-row">
+            <div class="input-wrapper">
+              <i class="fa-regular fa-circle-check input-icon"></i>
+              <input 
+                type="text" 
+                id="task-input" 
+                placeholder="What do you need to accomplish today?" 
+                autocomplete="off" 
+                required
+              >
+            </div>
+            
+            <div class="select-wrapper">
+              <select id="priority-select" title="Select Priority">
+                <option value="medium">⚡ Medium</option>
+                <option value="high">🔥 High</option>
+                <option value="low">🌱 Low</option>
+              </select>
+            </div>
+
+            <button type="submit" id="add-btn" class="btn btn-primary">
+              <i class="fa-solid fa-plus"></i>
+              <span>Add Task</span>
+            </button>
+          </div>
+        </form>
+      </section>
+
+      <!-- Stats Bar & Progress -->
+      <section class="stats-section">
+        <div class="stats-grid">
+          <div class="stat-box">
+            <span class="stat-number" id="total-count">0</span>
+            <span class="stat-label">Total Tasks</span>
+          </div>
+          <div class="stat-box active">
+            <span class="stat-number" id="pending-count">0</span>
+            <span class="stat-label">Pending</span>
+          </div>
+          <div class="stat-box success">
+            <span class="stat-number" id="completed-count">0</span>
+            <span class="stat-label">Completed</span>
+          </div>
+        </div>
+
+        <!-- Progress Bar -->
+        <div class="progress-container">
+          <div class="progress-bar-bg">
+            <div class="progress-bar-fill" id="progress-fill" style="width: 0%"></div>
+          </div>
+          <span class="progress-text" id="progress-text">0% Done</span>
+        </div>
+      </section>
+
+      <!-- Controls: Search & Filter Tabs -->
+      <section class="controls-section">
+        <div class="search-wrapper">
+          <i class="fa-solid fa-magnifying-glass search-icon"></i>
+          <input type="text" id="search-input" placeholder="Search tasks...">
+        </div>
+
+        <div class="filter-tabs">
+          <button class="filter-tab active" data-filter="all">All</button>
+          <button class="filter-tab" data-filter="active">Pending</button>
+          <button class="filter-tab" data-filter="completed">Completed</button>
+        </div>
+      </section>
+
+      <!-- Tasks List -->
+      <section class="list-section">
+        <ul id="todo-list" class="todo-list" aria-label="Task List">
+          <!-- Dynamic tasks rendered here via JS -->
+        </ul>
+
+        <!-- Empty State Message -->
+        <div id="empty-state" class="empty-state">
+          <div class="empty-icon">
+            <i class="fa-solid fa-clipboard-check"></i>
+          </div>
+          <h3>No tasks found</h3>
+          <p>Add a new task above or adjust your search filter.</p>
+        </div>
+      </section>
+
+      <!-- Footer Actions -->
+      <footer class="card-footer">
+        <span class="tasks-left-text" id="tasks-left">0 tasks remaining</span>
+        <button id="clear-completed-btn" class="btn-clear" title="Clear all completed tasks">
+          <i class="fa-regular fa-trash-can"></i>
+          <span>Clear Completed</span>
+        </button>
+      </footer>
+    </main>
+
+    <!-- App Credits / Footer -->
+    <footer class="app-credit">
+      <p>
+        Designed & Built by <strong>Harish Raghavendra</strong> for 
+        <strong>CodeOrbit Tech Full Stack Internship</strong>
+      </p>
+      <p class="storage-notice">
+        <i class="fa-solid fa-database"></i> Automatically saved to browser LocalStorage
+      </p>
+    </footer>
+  </div>
+
+  <!-- Edit Task Modal -->
+  <div id="edit-modal" class="modal-overlay hidden" role="dialog" aria-modal="true" aria-labelledby="modal-title">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h3 id="modal-title"><i class="fa-solid fa-pen-to-square"></i> Edit Task</h3>
+        <button id="close-modal-btn" class="close-btn" aria-label="Close dialog">&times;</button>
+      </div>
+      <form id="edit-form" class="edit-form">
+        <div class="form-group">
+          <label for="edit-task-input">Task Title</label>
+          <input type="text" id="edit-task-input" required>
+        </div>
+        <div class="form-group">
+          <label for="edit-priority-select">Priority</label>
+          <select id="edit-priority-select">
+            <option value="low">🌱 Low</option>
+            <option value="medium">⚡ Medium</option>
+            <option value="high">🔥 High</option>
+          </select>
+        </div>
+        <div class="modal-actions">
+          <button type="button" id="cancel-edit-btn" class="btn btn-secondary">Cancel</button>
+          <button type="submit" class="btn btn-primary">Save Changes</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- Toast Notification Container -->
+  <div id="toast-container" class="toast-container"></div>
+
+  <!-- JavaScript Logic -->
+  <script src="app.js"></script>
+</body>
+</html>
